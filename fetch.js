@@ -4,8 +4,7 @@ const output = document.querySelector("#output");
 const cancelBtn = document.querySelector("#cancelBtn");
 const searchBtn = document.querySelector("#search")
 
-let previousCity;
-let cityData;
+let cachedCityData = new Map();
 let controller;
 
 cancelBtn.disabled = true;
@@ -13,8 +12,8 @@ cancelBtn.disabled = true;
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  if (cityNameInput.value === previousCity) {
-    output.innerHTML = cityData;
+  if (cachedCityData.has(cityNameInput.value)) {
+    output.innerHTML = cachedCityData.get(cityNameInput.value);
     return;
   }
   controller = new AbortController();
@@ -71,6 +70,7 @@ form.addEventListener("submit", async (e) => {
           });
         }
         output.innerHTML = cityData;
+        cachedCityData.set(cityName , cityData)
         searchBtn.disabled = false;
         isDataFetched = false;
 
@@ -104,6 +104,7 @@ cancelBtn.addEventListener("click", () => {
   cityData = '';
   previousCity = '';
   cancelBtn.disabled = false;
+  searchBtn.disabled= false
 
 
 });
