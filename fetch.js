@@ -5,6 +5,7 @@ const cancelBtn = document.querySelector("#cancelBtn");
 const searchBtn = document.querySelector("#search")
 
 let cachedCityData = new Map();
+let cityData;
 let controller;
 
 cancelBtn.disabled = true;
@@ -42,14 +43,12 @@ form.addEventListener("submit", async (e) => {
     isDataFetched = true;
     searchBtn.disabled = true;
 
-    await fetch(API_URL, requestOptions)
-      .then((response) => {
+    try{
+      const response = await fetch(API_URL, requestOptions)
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        return response.json();
-      })
-      .then((data) => {
+        const data = await response.json();
         console.log(data);
         if (data.length === 0) {
           cityData = "Ooops!! City not found" + " " + "\u{1F62C}";
@@ -75,8 +74,8 @@ form.addEventListener("submit", async (e) => {
         isDataFetched = false;
 
 
-      })
-      .catch((error) => {
+      }
+      catch(error)  {
         if (error.name === "AbortError") {
           console.log("API call was cancelled");
           return;
@@ -85,12 +84,11 @@ form.addEventListener("submit", async (e) => {
         console.error("There was a problem with the fetch operation:", error);
         cityData = "Ooops!! Something went wrong" + " " + "\u{1F62C}";
         output.innerHTML = cityData;
-      })
-      .finally(() => {
+      }
+      finally {
         cityNameInput.disabled = false;
         cancelBtn.disabled = true;
-        previousCity = cityNameInput.value;
-      });
+      };
 
   }
 });
@@ -102,8 +100,7 @@ cancelBtn.addEventListener("click", () => {
   cityNameInput.value = "";
   output.innerHTML = "You cancelled the request.";
   cityData = '';
-  previousCity = '';
-  cancelBtn.disabled = false;
+  // cancelBtn.disabled = false;
   searchBtn.disabled= false
 
 
