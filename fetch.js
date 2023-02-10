@@ -2,7 +2,7 @@ const form = document.querySelector("#form");
 const cityNameInput = document.querySelector("#cityName");
 const output = document.querySelector("#output");
 const cancelBtn = document.querySelector("#cancelBtn");
-const searchBtn = document.querySelector("#search")
+const searchBtn = document.querySelector("#search");
 
 let cachedCityData = new Map();
 let cityData;
@@ -19,7 +19,6 @@ form.addEventListener("submit", async (e) => {
   }
   controller = new AbortController();
 
-
   cityNameInput.disabled = true;
   cancelBtn.disabled = false;
   output.innerHTML = "";
@@ -31,8 +30,7 @@ form.addEventListener("submit", async (e) => {
     method: "GET",
     headers: myHeaders,
     redirect: "follow",
-    signal: controller.signal
-
+    signal: controller.signal,
   };
 
   const cityName = cityNameInput.value;
@@ -43,21 +41,23 @@ form.addEventListener("submit", async (e) => {
     isDataFetched = true;
     searchBtn.disabled = true;
 
-    try{
-      const response = await fetch(API_URL, requestOptions)
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        console.log(data);
-        if (data.length === 0) {
-          cityData = "Ooops!! City not found" + " " + "\u{1F62C}";
-        } else {
-          cityData = "";
-          data.forEach((item) => {
-            cityData += `
+    try {
+      const response = await fetch(API_URL, requestOptions);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      console.log(data);
+      if (data.length === 0) {
+        cityData = "Ooops!! City not found" + " " + "\u{1F62C}";
+      } else {
+        cityData = "";
+        data.forEach((item) => {
+          cityData += `
             <ul>
-              <h1>The Details For The City - ${Date.now()}: <i>${item.name}</i></h1>
+              <h1>The Details For The City - ${Date.now()}: <i>${
+            item.name
+          }</i></h1>
               <li>City: ${item.name}</li>
               <li>Country: ${item.country}</li>
               <li>Is The City a Capital City?: ${item.is_capital}</li>
@@ -66,30 +66,25 @@ form.addEventListener("submit", async (e) => {
               <li>Population: ${item.population}</li>
             </ul> 
           `;
-          });
-        }
-        output.innerHTML = cityData;
-        cachedCityData.set(cityName , cityData)
-        searchBtn.disabled = false;
-        isDataFetched = false;
-
-
+        });
       }
-      catch(error)  {
-        if (error.name === "AbortError") {
-          console.log("API call was cancelled");
-          return;
-        }
-
-        console.error("There was a problem with the fetch operation:", error);
-        cityData = "Ooops!! Something went wrong" + " " + "\u{1F62C}";
-        output.innerHTML = cityData;
+      output.innerHTML = cityData;
+      cachedCityData.set(cityName, cityData);
+      searchBtn.disabled = false;
+      isDataFetched = false;
+    } catch (error) {
+      if (error.name === "AbortError") {
+        console.log("API call was cancelled");
+        return;
       }
-      finally {
-        cityNameInput.disabled = false;
-        cancelBtn.disabled = true;
-      };
 
+      console.error("There was a problem with the fetch operation:", error);
+      cityData = "Ooops!! Something went wrong" + " " + "\u{1F62C}";
+      output.innerHTML = cityData;
+    } finally {
+      cityNameInput.disabled = false;
+      cancelBtn.disabled = true;
+    }
   }
 });
 
@@ -99,43 +94,7 @@ cancelBtn.addEventListener("click", () => {
   cityNameInput.disabled = false;
   cityNameInput.value = "";
   output.innerHTML = "You cancelled the request.";
-  cityData = '';
+  cityData = "";
   // cancelBtn.disabled = false;
-  searchBtn.disabled= false
-
-
+  searchBtn.disabled = false;
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
