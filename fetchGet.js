@@ -1,4 +1,3 @@
-const form = document.querySelector("#form");
 const cityNameInput = document.querySelector("#cityName");
 const output = document.querySelector("#output");
 const cancelBtn = document.querySelector("#cancelBtn");
@@ -7,9 +6,14 @@ let cachedCityData = new Map();
 let controller;
 
 
-form.addEventListener("submit", async (e) => {
+searchBtn.addEventListener("click", async (e) => {
   e.preventDefault();
-  
+
+  if (cityNameInput.value === "") {
+    output.innerHTML = "Please enter a city name" ;
+    return
+    
+  }
   if (cachedCityData.has(cityNameInput.value)) {
     output.innerHTML = cachedCityData.get(cityNameInput.value);
     return;
@@ -17,7 +21,7 @@ form.addEventListener("submit", async (e) => {
   controller = new AbortController();
   
   cityNameInput.disabled = true;
-  cancelBtn.disabled = false;
+  cancelBtn.hidden = false;
   output.innerHTML = "";
   let cityData = "";
 
@@ -80,12 +84,19 @@ form.addEventListener("submit", async (e) => {
 
     } finally {
       cityNameInput.disabled = false;
-      cancelBtn.disabled = true;
+      cancelBtn.hidden = true;
       searchBtn.disabled = false;
 
     }
   }
 });
+
+const hideCancelMessage = () => {
+  setTimeout(() => {
+    output.innerHTML = "";
+  }, 3000); 
+}
+
 
 // ADDING CANCEL BUTTON TO CANCEL API REQUEST
 cancelBtn.addEventListener("click", () => {
@@ -94,5 +105,6 @@ cancelBtn.addEventListener("click", () => {
   cityNameInput.value = "";
   output.innerHTML = "You cancelled the request.";
   searchBtn.disabled = false;
+  hideCancelMessage();
 });
 
