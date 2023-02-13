@@ -3,25 +3,23 @@ const cityNameInput = document.querySelector("#cityName");
 const output = document.querySelector("#output");
 const cancelBtn = document.querySelector("#cancelBtn");
 const searchBtn = document.querySelector("#search");
-
 let cachedCityData = new Map();
-let cityData;
 let controller;
 
-cancelBtn.disabled = true;
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-
+  
   if (cachedCityData.has(cityNameInput.value)) {
     output.innerHTML = cachedCityData.get(cityNameInput.value);
     return;
   }
   controller = new AbortController();
-
+  
   cityNameInput.disabled = true;
   cancelBtn.disabled = false;
   output.innerHTML = "";
+  let cityData = "";
 
   let myHeaders = new Headers();
   myHeaders.append("X-Api-Key", "iFFhBwWW3gM1Ji3p6VRVdw==0vaC8rrDpuIIZlNc");
@@ -47,11 +45,9 @@ form.addEventListener("submit", async (e) => {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-      console.log(data);
       if (data.length === 0) {
         cityData = "Ooops!! City not found" + " " + "\u{1F62C}";
       } else {
-        cityData = "";
         data.forEach((item) => {
           cityData += `
             <ul>
@@ -70,7 +66,6 @@ form.addEventListener("submit", async (e) => {
       }
       output.innerHTML = cityData;
       cachedCityData.set(cityName, cityData);
-      searchBtn.disabled = false;
       isDataFetched = false;
     } catch (error) {
       if (error.name === "AbortError") {
@@ -81,9 +76,13 @@ form.addEventListener("submit", async (e) => {
       console.error("There was a problem with the fetch operation:", error);
       cityData = "Ooops!! Something went wrong" + " " + "\u{1F62C}";
       output.innerHTML = cityData;
+      cachedCityData.set(cityName, cityData);
+
     } finally {
       cityNameInput.disabled = false;
       cancelBtn.disabled = true;
+      searchBtn.disabled = false;
+
     }
   }
 });
@@ -94,7 +93,6 @@ cancelBtn.addEventListener("click", () => {
   cityNameInput.disabled = false;
   cityNameInput.value = "";
   output.innerHTML = "You cancelled the request.";
-  cityData = "";
-  // cancelBtn.disabled = false;
   searchBtn.disabled = false;
 });
+
