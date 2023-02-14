@@ -5,46 +5,35 @@ const searchBtn = document.querySelector("#search");
 let cachedCityData = new Map();
 let controller;
 
-
 searchBtn.addEventListener("click", async (e) => {
   e.preventDefault();
 
   if (cityNameInput.value === "") {
     output.innerHTML = "Please enter a city name" ;
-    return
-    
+    return   
   }
+
   if (cachedCityData.has(cityNameInput.value)) {
     output.innerHTML = cachedCityData.get(cityNameInput.value);
     return;
   }
+
   controller = new AbortController();
-  
   cityNameInput.disabled = true;
   cancelBtn.hidden = false;
   output.innerHTML = "";
   let cityData = "";
 
-  let myHeaders = new Headers();
-  myHeaders.append("X-Api-Key", "iFFhBwWW3gM1Ji3p6VRVdw==0vaC8rrDpuIIZlNc");
-
-  let requestOptions = {
-    method: "GET",
-    headers: myHeaders,
-    redirect: "follow",
-    signal: controller.signal,
-  };
-
-  const cityName = cityNameInput.value;
-  let isDataFetched = false;
-  const API_URL = `https://api.api-ninjas.com/v1/city?name=${cityName}`;
-
-  if (!isDataFetched) {
-    isDataFetched = true;
-    searchBtn.disabled = true;
-
-    try {
-      const response = await fetch(API_URL, requestOptions);
+  const cityName = cityNameInput.value;  
+  try {
+      searchBtn.disabled = true;
+      const response = await fetch(`https://api.api-ninjas.com/v1/city?name=${cityName}`, {
+        method: "GET",
+        headers: {
+          "X-Api-Key":"iFFhBwWW3gM1Ji3p6VRVdw==0vaC8rrDpuIIZlNc"
+        },
+        signal: controller.signal,
+      });
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -67,10 +56,9 @@ searchBtn.addEventListener("click", async (e) => {
             </ul> 
           `;
         });
+        cachedCityData.set(cityName, cityData);
       }
       output.innerHTML = cityData;
-      cachedCityData.set(cityName, cityData);
-      isDataFetched = false;
     } catch (error) {
       if (error.name === "AbortError") {
         console.log("API call was cancelled");
@@ -88,7 +76,6 @@ searchBtn.addEventListener("click", async (e) => {
       searchBtn.disabled = false;
 
     }
-  }
 });
 
 const hideCancelMessage = () => {
